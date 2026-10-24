@@ -1,0 +1,97 @@
+/* Styles that only make sense together with the Pannellum canvas. */
+.ttk-pano-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #0f172a;
+}
+
+.ttk-pano-stage canvas {
+  outline: none;
+}
+
+.ttk-pano-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #e2e8f0;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  background: rgba(15, 23, 42, 0.72);
+  z-index: 15;
+}
+
+/* Contract hotspots rendered inside the sphere. */
+.ttk-pano-hotspot {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.ttk-pano-hotspot:hover {
+  transform: scale(1.08);
+}
+
+.ttk-pano-hotspot__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.1;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.45);
+  transform: translate(-50%, -50%);
+}
+
+.ttk-pano-hotspot--poi .ttk-pano-hotspot__label {
+  background: #ffffff;
+  color: #0f172a;
+  border: 2px solid #e31b23;
+}
+
+.ttk-pano-hotspot--transition .ttk-pano-hotspot__label {
+  background: rgba(227, 27, 35, 0.92);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.75);
+}
+
+.ttk-pano-hotspot--transition .ttk-pano-hotspot__label::before {
+  content: '→';
+  font-weight: 800;
+}
+
+.ttk-pano-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #0f172a;
+}
+
+.ttk-pano-fallback img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.55;
+  filter: blur(1px);
+}
+
+.ttk-pano-fallback__notice {
+  position: relative;
+  max-width: 22rem;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: #e2e8f0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  text-align: center;
+}

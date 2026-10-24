@@ -1,0 +1,41 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: api
+    env_file: [.env]
+    ports: ["127.0.0.1:8000:8000"]
+    volumes: ["ttkmap-data:/data"]
+    restart: unless-stopped
+    init: true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: worker
+    env_file: [.env]
+    volumes: ["ttkmap-data:/data"]
+    restart: unless-stopped
+    init: true
+    mem_limit: 3g
+    cpus: 2
+    stop_grace_period: 15s
+  backend-test:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: backend-test
+    environment:
+      DATABASE_PATH: /tmp/ttkmap-test.sqlite
+      MEDIA_PATH: /tmp/ttkmap-test-media
+      APP_ORIGIN: http://127.0.0.1:5173
+      COOKIE_SECURE: "false"
+    profiles: [test]
+volumes:
+  ttkmap-data:

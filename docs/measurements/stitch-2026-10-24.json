@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-24",
+  "environment": "Linux x86_64, Python 3.12 Docker, Hugin 2022.0.0 / enblend 4.2",
+  "fixture": "series_01",
+  "input": "16 real fixture JPEGs, resized proportionally to 600x800, JPEG quality 90",
+  "matching": "cpfind exhaustive pairs, sieve2size=3; cpclean and autooptimiser",
+  "control_point_count": 1637,
+  "reprojection_rms_px": 3.321,
+  "full_canvas_px": [4096, 2048],
+  "output_px": [4096, 728],
+  "vaov_deg": 63.984375,
+  "v_offset_deg": -2.900390625,
+  "limits": "One diagnostic run; values can vary with feature matching. Not physical-phone acceptance or a performance benchmark. Final integration asserts bounded quality, not these exact values."
+}

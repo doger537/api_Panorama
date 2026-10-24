@@ -1,0 +1,1410 @@
+openapi: 3.0.3
+info:
+  title: TTKMap Space Map API
+  version: 0.1.0
+  description: Contract-first API for the TTK interactive space map.
+servers:
+- url: /
+security:
+- SessionCookie: []
+paths:
+  /healthz:
+    get:
+      operationId: health
+      security: []
+      responses:
+        '200':
+          description: Service is available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        '503':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /api/v1/auth/login:
+    post:
+      operationId: login
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/Origin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Session created
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: HttpOnly, SameSite=Lax organizer session cookie.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '401':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+  /api/v1/auth/session:
+    get:
+      operationId: getSession
+      responses:
+        '200':
+          description: Current organizer session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '401':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /api/v1/auth/logout:
+    post:
+      operationId: logout
+      parameters:
+      - $ref: '#/components/parameters/Origin'
+      - $ref: '#/components/parameters/CsrfToken'
+      responses:
+        '204':
+          description: Session revoked
+        '401':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+  /api/v1/maps:
+    get:
+      operationId: listMaps
+      responses:
+        '200':
+          description: Owned maps
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MapSummary'
+        '401':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      parameters:
+      - in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+      - in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 100
+          maximum: 100
+    post:
+      operationId: createMap
+      parameters:
+      - $ref: '#/components/parameters/Origin'
+      - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMapRequest'
+      responses:
+        '201':
+          description: Draft map
+          headers:
+            ETag:
+              $ref: '#/components/headers/MapEtag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizerMap'
+        '401':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+  /api/v1/maps/{map_id}:
+    parameters:
+    - $ref: '#/components/parameters/MapId'
+    get:
+      operationId: getMap
+      responses:
+        '200':
+          description: Organizer snapshot
+          headers:
+            ETag:
+              $ref: '#/components/headers/MapEtag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizerMap'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+    delete:
+      operationId: deleteMap
+      parameters:
+      - $ref: '#/components/parameters/Origin'
+      - $ref: '#/components/parameters/CsrfToken'
+      - $ref: '#/components/parameters/IfMatch'
+      responses:
+        '204':
+          description: Map and its media access are deleted.
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '412':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+  /api/v1/maps/{map_id}/document:
+    parameters:
+    - $ref: '#/components/parameters/MapId'
+    put:
+      operationId: replaceMapDocument
+      parameters:
+      - $ref: '#/components/parameters/Origin'
+      - $ref: '#/components/parameters/CsrfToken'
+      - $ref: '#/components/parameters/IfMatch'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MapDocument'
+      responses:
+        '200':
+          description: Atomically saved document
+          headers:
+            ETag:
+              $ref: '#/components/headers/MapEtag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizerMap'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '412':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      description: Atomic full document replacement. Requires matching ETag. Publishing
+        requires at least one POI; panoramas and graph coverage are optional and gaps
+        are reported in route responses.
+  /api/v1/maps/{map_id}/assets:
+    parameters:
+    - $ref: '#/components/parameters/MapId'
+    get:
+      operationId: listAssets
+      responses:
+        '200':
+          description: Ready media assets owned by this organizer.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AssetRef'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: uploadAsset
+      parameters:
+      - $ref: '#/components/parameters/Origin'
+      - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AssetUpload'
+      responses:
+        '201':
+          description: Validated and optimized asset; not public until attached to
+            a map document.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetRef'
+        '401':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '415':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '503':
+          $ref: '#/components/responses/Error'
+  /api/v1/maps/{map_id}/captures:
+    parameters:
+    - $ref: '#/components/parameters/MapId'
+    get:
+      operationId: listCaptures
+      responses:
+        '200':
+          description: Owner capture sessions, newest first.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Capture'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: createCapture
+      parameters:
+      - $ref: '#/components/parameters/Origin'
+      - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCaptureRequest'
+      responses:
+        '201':
+          description: Collecting capture with 16 fixed frame slots.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Capture'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+  /api/v1/maps/{map_id}/captures/{capture_id}:
+    parameters:
+    - $ref: '#/components/parameters/MapId'
+    - $ref: '#/components/parameters/CaptureId'
+    get:
+      operationId: getCapture
+      responses:
+        '200':
+          description: Current capture state for polling.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Capture'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /api/v1/maps/{map_id}/captures/{capture_id}/frames/{index}:
+    parameters:
+    - $ref: '#/components/parameters/MapId'
+    - $ref: '#/components/parameters/CaptureId'
+    - $ref: '#/components/parameters/FrameIndex'
+    put:
+      operationId: putCaptureFrame
+      parameters:
+      - $ref: '#/components/parameters/Origin'
+      - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FrameUpload'
+      responses:
+        '200':
+          description: Frame uploaded or an identical retry acknowledged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Capture'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '415':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '400':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+  /api/v1/maps/{map_id}/captures/{capture_id}/stitch:
+    parameters:
+    - $ref: '#/components/parameters/MapId'
+    - $ref: '#/components/parameters/CaptureId'
+    post:
+      operationId: startStitch
+      parameters:
+      - $ref: '#/components/parameters/Origin'
+      - $ref: '#/components/parameters/CsrfToken'
+      responses:
+        '202':
+          description: Durable job queued; poll capture status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Capture'
+        '409':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+  /api/v1/maps/{map_id}/captures/{capture_id}/cancel:
+    parameters:
+    - $ref: '#/components/parameters/MapId'
+    - $ref: '#/components/parameters/CaptureId'
+    post:
+      operationId: cancelCapture
+      parameters:
+      - $ref: '#/components/parameters/Origin'
+      - $ref: '#/components/parameters/CsrfToken'
+      responses:
+        '200':
+          description: Capture was cancelled and its worker lease invalidated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Capture'
+        '409':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+  /api/v1/media/{asset_id}/{variant}:
+    get:
+      operationId: getMedia
+      security:
+      - {}
+      - SessionCookie: []
+      parameters:
+      - name: asset_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: variant
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - preview
+          - mobile
+          - full
+      - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          description: Authorization-checked WebP derivative.
+          content:
+            image/webp:
+              schema:
+                type: string
+                format: binary
+        '304':
+          description: Authorized asset is unchanged.
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /api/v1/public/maps/{slug}:
+    get:
+      operationId: getPublicMap
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/Slug'
+      - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          description: Published map snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicMap'
+        '304':
+          description: Snapshot unchanged
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /api/v1/public/maps/{slug}/route:
+    post:
+      operationId: buildRoute
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/Slug'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteRequest'
+      responses:
+        '200':
+          description: Calculated route
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteResponse'
+        '404':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+components:
+  securitySchemes:
+    SessionCookie:
+      type: apiKey
+      in: cookie
+      name: ttk_session
+  headers:
+    MapEtag:
+      schema:
+        type: string
+      description: Strong map revision validator in the form map-uuid-vrevision.
+  parameters:
+    Origin:
+      name: Origin
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uri
+    CsrfToken:
+      name: X-CSRF-Token
+      in: header
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9a-f]{64}$
+    IfMatch:
+      name: If-Match
+      in: header
+      required: true
+      schema:
+        type: string
+    IfNoneMatch:
+      name: If-None-Match
+      in: header
+      required: false
+      schema:
+        type: string
+    MapId:
+      name: map_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    Slug:
+      name: slug
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Slug'
+    CaptureId:
+      name: capture_id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    FrameIndex:
+      name: index
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 15
+  responses:
+    Error:
+      description: Stable JSON error envelope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  schemas:
+    UUID:
+      type: string
+      format: uuid
+    Slug:
+      type: string
+      pattern: ^[a-z2-7]{26}$
+    Timestamp:
+      type: string
+      format: date-time
+    Health:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          enum:
+          - ok
+    ApiError:
+      type: object
+      additionalProperties: false
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required:
+          - code
+          - message
+          - issues
+          - current_revision
+          properties:
+            code:
+              type: string
+              enum:
+              - BAD_REQUEST
+              - AUTH_REQUIRED
+              - INVALID_CREDENTIALS
+              - FORBIDDEN
+              - NOT_FOUND
+              - CONFLICT
+              - VERSION_CONFLICT
+              - VALIDATION_ERROR
+              - PUBLISH_BLOCKED
+              - ROUTE_NOT_FOUND
+              - MEDIA_TOO_LARGE
+              - UNSUPPORTED_MEDIA_TYPE
+              - RATE_LIMITED
+              - INTERNAL_ERROR
+              - SERVICE_UNAVAILABLE
+            message:
+              type: string
+            issues:
+              type: array
+              items:
+                $ref: '#/components/schemas/ValidationIssue'
+            current_revision:
+              type: integer
+              nullable: true
+    ValidationIssue:
+      type: object
+      additionalProperties: false
+      required:
+      - path
+      - message
+      properties:
+        path:
+          type: string
+        message:
+          type: string
+    User:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - email
+      - role
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum:
+          - organizer
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - email
+      - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 12
+          maxLength: 128
+    Session:
+      type: object
+      additionalProperties: false
+      required:
+      - user
+      - csrf_token
+      - expires_at
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        csrf_token:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+        expires_at:
+          $ref: '#/components/schemas/Timestamp'
+    CreateMapRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - title
+      - description
+      - width_units
+      - height_units
+      - scale_m_per_unit
+      - max_walk_gap_units
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 160
+        description:
+          type: string
+          maxLength: 4000
+        width_units:
+          type: integer
+          minimum: 1
+        height_units:
+          type: integer
+          minimum: 1
+        scale_m_per_unit:
+          type: number
+          nullable: true
+          minimum: 0
+          exclusiveMinimum: true
+          maximum: 1000
+        max_walk_gap_units:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+          maximum: 1000000
+    Point:
+      type: object
+      additionalProperties: false
+      required:
+      - x
+      - y
+      properties:
+        x:
+          type: number
+          minimum: 0
+          maximum: 100000
+        y:
+          type: number
+          minimum: 0
+          maximum: 100000
+    Shape:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - kind
+      - label
+      - points
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        kind:
+          type: string
+          enum:
+          - wall
+          - room
+          - corridor
+        label:
+          type: string
+          maxLength: 160
+        points:
+          type: array
+          minItems: 2
+          maxItems: 512
+          items:
+            $ref: '#/components/schemas/Point'
+    NavNode:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - x
+      - y
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        x:
+          type: number
+          minimum: 0
+          maximum: 100000
+        y:
+          type: number
+          minimum: 0
+          maximum: 100000
+    NavEdge:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - a
+      - b
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        a:
+          $ref: '#/components/schemas/UUID'
+        b:
+          $ref: '#/components/schemas/UUID'
+    Poi:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - title
+      - category
+      - category_label
+      - description
+      - x
+      - y
+      - nav_node_id
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 160
+        category:
+          type: string
+          enum:
+          - booth
+          - hall
+          - entrance
+          - service_desk
+          - wifi
+          - custom
+        category_label:
+          type: string
+          minLength: 1
+          maxLength: 80
+          nullable: true
+        description:
+          type: string
+          maxLength: 4000
+        x:
+          type: number
+          minimum: 0
+          maximum: 100000
+        y:
+          type: number
+          minimum: 0
+          maximum: 100000
+        nav_node_id:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
+    Panorama:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - asset_id
+      - title
+      - x
+      - y
+      - nav_node_id
+      - heading_offset_deg
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        asset_id:
+          $ref: '#/components/schemas/UUID'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 160
+        x:
+          type: number
+          minimum: 0
+          maximum: 100000
+        y:
+          type: number
+          minimum: 0
+          maximum: 100000
+        nav_node_id:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
+        heading_offset_deg:
+          type: number
+          minimum: -180
+          maximum: 180
+          exclusiveMaximum: true
+    Hotspot:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - panorama_id
+      - kind
+      - yaw_deg
+      - pitch_deg
+      - poi_id
+      - target_panorama_id
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        panorama_id:
+          $ref: '#/components/schemas/UUID'
+        kind:
+          type: string
+          enum:
+          - poi
+          - transition
+        yaw_deg:
+          type: number
+          minimum: -180
+          maximum: 180
+          exclusiveMaximum: true
+        pitch_deg:
+          type: number
+          minimum: -90
+          maximum: 90
+        poi_id:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
+        target_panorama_id:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
+    MapDocument:
+      type: object
+      additionalProperties: false
+      required:
+      - title
+      - description
+      - is_published
+      - scale_m_per_unit
+      - max_walk_gap_units
+      - background_asset_id
+      - shapes
+      - nodes
+      - edges
+      - pois
+      - panoramas
+      - hotspots
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 160
+        description:
+          type: string
+          maxLength: 4000
+        is_published:
+          type: boolean
+        scale_m_per_unit:
+          type: number
+          nullable: true
+          minimum: 0
+          exclusiveMinimum: true
+          maximum: 1000
+        max_walk_gap_units:
+          type: number
+          minimum: 0
+          exclusiveMinimum: true
+          maximum: 1000000
+        background_asset_id:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
+        shapes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Shape'
+          maxItems: 1000
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/NavNode'
+          maxItems: 2000
+        edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/NavEdge'
+          maxItems: 4000
+        pois:
+          type: array
+          items:
+            $ref: '#/components/schemas/Poi'
+          maxItems: 500
+        panoramas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Panorama'
+          maxItems: 200
+        hotspots:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hotspot'
+          maxItems: 4000
+    AssetRef:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - kind
+      - source
+      - width_px
+      - height_px
+      - projection
+      - haov_deg
+      - vaov_deg
+      - v_offset_deg
+      - preview_url
+      - mobile_url
+      - full_url
+      - created_at
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        kind:
+          type: string
+          enum:
+          - plan
+          - panorama
+        source:
+          type: string
+          enum:
+          - upload
+          - stitch
+        width_px:
+          type: integer
+          minimum: 1
+          maximum: 4096
+        height_px:
+          type: integer
+          minimum: 1
+          maximum: 4096
+        projection:
+          type: string
+          enum:
+          - equirectangular
+          nullable: true
+        haov_deg:
+          type: number
+          enum:
+          - 360
+          nullable: true
+        vaov_deg:
+          type: number
+          nullable: true
+        v_offset_deg:
+          type: number
+          nullable: true
+        preview_url:
+          type: string
+        mobile_url:
+          type: string
+        full_url:
+          type: string
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+    AssetUpload:
+      type: object
+      additionalProperties: false
+      required:
+      - kind
+      - file
+      properties:
+        kind:
+          type: string
+          enum:
+          - plan
+          - panorama
+        file:
+          type: string
+          format: binary
+      description: JPEG, PNG or WebP. Plan limit 15 MiB. Panorama limit 40 MiB and
+        declared full equirectangular 2:1 image. SVG, HEIC and PDF are rejected.
+    MapSnapshot:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - slug
+      - revision
+      - width_units
+      - height_units
+      - updated_at
+      - document
+      - assets
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        slug:
+          $ref: '#/components/schemas/Slug'
+        revision:
+          type: integer
+        width_units:
+          type: integer
+        height_units:
+          type: integer
+        updated_at:
+          $ref: '#/components/schemas/Timestamp'
+        document:
+          $ref: '#/components/schemas/MapDocument'
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetRef'
+    OrganizerMap:
+      type: object
+      additionalProperties: false
+      required:
+      - snapshot
+      - owner_id
+      - created_at
+      properties:
+        snapshot:
+          $ref: '#/components/schemas/MapSnapshot'
+        owner_id:
+          $ref: '#/components/schemas/UUID'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+    PublicMap:
+      allOf:
+      - $ref: '#/components/schemas/MapSnapshot'
+    MapSummary:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - slug
+      - title
+      - is_published
+      - revision
+      - updated_at
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        slug:
+          $ref: '#/components/schemas/Slug'
+        title:
+          type: string
+        is_published:
+          type: boolean
+        revision:
+          type: integer
+        updated_at:
+          $ref: '#/components/schemas/Timestamp'
+    CreateCaptureRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - title
+      - x
+      - y
+      - hfov_hint_deg
+      properties:
+        title:
+          type: string
+        x:
+          type: number
+        y:
+          type: number
+        hfov_hint_deg:
+          type: number
+    Capture:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - map_id
+      - title
+      - x
+      - y
+      - hfov_hint_deg
+      - state
+      - progress
+      - attempt
+      - frames
+      - result_asset_id
+      - error_code
+      - error_message
+      - created_at
+      - updated_at
+      - started_at
+      - finished_at
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        map_id:
+          $ref: '#/components/schemas/UUID'
+        title:
+          type: string
+        x:
+          type: number
+        y:
+          type: number
+        hfov_hint_deg:
+          type: number
+          minimum: 40
+          maximum: 85
+        state:
+          type: string
+          enum:
+          - collecting
+          - queued
+          - running
+          - succeeded
+          - failed
+          - cancelled
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+        attempt:
+          type: integer
+          minimum: 0
+          maximum: 2
+        frames:
+          type: array
+          items:
+            $ref: '#/components/schemas/CaptureFrame'
+        result_asset_id:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
+        error_code:
+          type: string
+          enum:
+          - INPUT_EXPIRED
+          - NOT_ENOUGH_OVERLAP
+          - LOOP_NOT_CLOSED
+          - INSUFFICIENT_COVERAGE
+          - QUALITY_REJECTED
+          - TIMEOUT
+          - WORKER_LOST
+          - TOOL_FAILED
+          nullable: true
+        error_message:
+          type: string
+          nullable: true
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        updated_at:
+          $ref: '#/components/schemas/Timestamp'
+        started_at:
+          type: string
+          format: date-time
+          nullable: true
+        finished_at:
+          type: string
+          format: date-time
+          nullable: true
+      description: collecting uses attempt=0/progress=0; queued uses attempt=1..2/progress=0;
+        running has progress 1..99; succeeded has progress=100 and result_asset_id;
+        failed has an error code/message; cancelled has no result. Terminal states
+        have finished_at.
+    CaptureFrame:
+      type: object
+      additionalProperties: false
+      required:
+      - index
+      - sha256
+      - width_px
+      - height_px
+      properties:
+        index:
+          type: integer
+          minimum: 0
+          maximum: 15
+        sha256:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+        width_px:
+          type: integer
+          minimum: 1
+          maximum: 1600
+        height_px:
+          type: integer
+          minimum: 1
+          maximum: 1600
+    FrameUpload:
+      type: object
+      additionalProperties: false
+      required:
+      - file
+      properties:
+        file:
+          type: string
+          format: binary
+      description: JPEG, PNG or WebP up to 12 MiB. EXIF rotation is applied and GPS
+        metadata removed. Upload is idempotent by frame index and SHA-256.
+    RouteRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - revision
+      - from_node_id
+      - to_node_id
+      properties:
+        revision:
+          type: integer
+        from_node_id:
+          $ref: '#/components/schemas/UUID'
+        to_node_id:
+          $ref: '#/components/schemas/UUID'
+    RouteResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - revision
+      - node_ids
+      - polyline
+      - distance_units
+      - distance_m
+      - walk
+      properties:
+        revision:
+          type: integer
+        node_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/UUID'
+        polyline:
+          type: array
+          items:
+            $ref: '#/components/schemas/Point'
+        distance_units:
+          type: number
+        distance_m:
+          type: number
+          nullable: true
+        walk:
+          $ref: '#/components/schemas/PanoramaWalk'
+    PanoramaWalkStep:
+      type: object
+      additionalProperties: false
+      required:
+      - node_id
+      - panorama_id
+      - yaw_deg
+      - next_hotspot_id
+      properties:
+        node_id:
+          $ref: '#/components/schemas/UUID'
+        panorama_id:
+          $ref: '#/components/schemas/UUID'
+        yaw_deg:
+          type: number
+          minimum: -180
+          maximum: 180
+          exclusiveMaximum: true
+        next_hotspot_id:
+          allOf:
+          - $ref: '#/components/schemas/UUID'
+          nullable: true
+    PanoramaWalkGap:
+      type: object
+      additionalProperties: false
+      required:
+      - from_node_id
+      - to_node_id
+      - reason
+      properties:
+        from_node_id:
+          $ref: '#/components/schemas/UUID'
+        to_node_id:
+          $ref: '#/components/schemas/UUID'
+        reason:
+          type: string
+          enum:
+          - same_node
+          - missing_panorama
+          - missing_transition
+          - gap_too_large
+    PanoramaWalk:
+      type: object
+      additionalProperties: false
+      required:
+      - available
+      - steps
+      - gaps
+      properties:
+        available:
+          type: boolean
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/PanoramaWalkStep'
+        gaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/PanoramaWalkGap'

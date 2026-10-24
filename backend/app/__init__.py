@@ -1,0 +1,1 @@
+"""TTKMap FastAPI application package."""

@@ -1,0 +1,247 @@
+{
+  "series": [
+    {
+      "id": "series_01",
+      "description": "Indoor office space panorama capture",
+      "device": {
+        "type": "smartphone",
+        "make": "Unknown",
+        "model": "Unknown",
+        "os": "Unknown",
+        "capture_date": null
+      },
+      "capture_params": {
+        "total_frames": 16,
+        "angular_step_deg": 22.5,
+        "coverage_horizontal_deg": 360,
+        "orientation": "portrait",
+        "resolution": "1920x2560"
+      },
+      "frames": [
+        {
+          "index": 0,
+          "filename": "photo_1_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 0,
+          "sha256": "f42c826cdc4492d7e69f746c0a6e35edf19e86d9590be3e9fbb062e79d2b4059"
+        },
+        {
+          "index": 1,
+          "filename": "photo_2_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 22.5,
+          "sha256": "d7cc07bea63d5e839e673dd1844eeca6899c82b9048925c453f4fad02b629ded"
+        },
+        {
+          "index": 2,
+          "filename": "photo_3_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 45,
+          "sha256": "b9c224b11d3fb9a405631bda94cec3d81e0f209cb52b885169b7c38ea7be3cea"
+        },
+        {
+          "index": 3,
+          "filename": "photo_4_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 67.5,
+          "sha256": "7b4b9ba5c3332ef8ba851e800736439744c444d1650b49822a037f1af9fc9209"
+        },
+        {
+          "index": 4,
+          "filename": "photo_5_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 90,
+          "sha256": "06a229e304e36286c1f2e72c4822296b0d1e5a49fae07a62b96b1da77602e5ce"
+        },
+        {
+          "index": 5,
+          "filename": "photo_6_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 112.5,
+          "sha256": "e0a39337d4119c2ab7ec6b6287fc2439220e92170860746ec10eda1676f6795d"
+        },
+        {
+          "index": 6,
+          "filename": "photo_7_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 135,
+          "sha256": "67fa57826a1809e387c31134afbb943cf42d74bb7c35a9db6b6ec5b64d0d69fa"
+        },
+        {
+          "index": 7,
+          "filename": "photo_8_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 157.5,
+          "sha256": "a1236c2ffc6f312c3012076628171c73624328b49e54dfd8b3cffde41e573398"
+        },
+        {
+          "index": 8,
+          "filename": "photo_9_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 180,
+          "sha256": "9f91945c915aaded0da3f530188a58ecb37594b87aa04d21e5ebb7e1a2b15a8e"
+        },
+        {
+          "index": 9,
+          "filename": "photo_10_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 202.5,
+          "sha256": "36fc2fcc2cca9c2227f17a18626c60fbc18737e13b3077bcad7d264962ae7a68"
+        },
+        {
+          "index": 10,
+          "filename": "photo_11_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 225,
+          "sha256": "437af4450f2afa124be28a369335737632e84f0fd47b67d1b0e92ac6ff39e16d"
+        },
+        {
+          "index": 11,
+          "filename": "photo_12_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 247.5,
+          "sha256": "fde1ea4cd7e79806457d8598c192d9c960b8b0cb7e15898da8110ee12bfb36e2"
+        },
+        {
+          "index": 12,
+          "filename": "photo_13_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 270,
+          "sha256": "4a40b11b5f793ea56df490e0c8f9087266083da74f062c7b7fa4f3b43b3455ec"
+        },
+        {
+          "index": 13,
+          "filename": "photo_14_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 292.5,
+          "sha256": "20b42e84c62ebaba47bc9fc42d6ded5f7a612d2b714b8b7128043d42380d617f"
+        },
+        {
+          "index": 14,
+          "filename": "photo_15_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 315,
+          "sha256": "3e7ed20176a903d5baaa37856890b8251512c0d35848f623bdbc78373152324e"
+        },
+        {
+          "index": 15,
+          "filename": "photo_16_2026-10-24_08-13-40.jpg",
+          "yaw_deg": 337.5,
+          "sha256": "2d281bfc1a30d63049e2e2629849c09434d4639301e20e9fd7230423c8af7179"
+        }
+      ],
+      "expected_output": {
+        "format": "equirectangular",
+        "aspect_ratio": "width / height consistent with measured vaov",
+        "min_resolution": "4096 px wide; height determined by measured coverage",
+        "vertical_coverage_deg": "measured by worker; not assumed 180",
+        "quality_threshold": "acceptable_overlap"
+      },
+      "provenance": {
+        "source": "Real device capture provided by project contributor",
+        "license": "Used with permission for TTKMap testing purposes",
+        "usage": "Integration and stitching algorithm testing only"
+      }
+    }
+  ],
+  "negative_cases": [
+    {
+      "id": "incomplete_series",
+      "description": "Missing frames (only 8 of 16)",
+      "reason": "Insufficient coverage for 360° panorama",
+      "directory": "negative_incomplete",
+      "frames": [
+        {
+          "filename": "photo_1_2026-10-24_08-13-40.jpg",
+          "sha256": "f42c826cdc4492d7e69f746c0a6e35edf19e86d9590be3e9fbb062e79d2b4059"
+        },
+        {
+          "filename": "photo_2_2026-10-24_08-13-40.jpg",
+          "sha256": "d7cc07bea63d5e839e673dd1844eeca6899c82b9048925c453f4fad02b629ded"
+        },
+        {
+          "filename": "photo_3_2026-10-24_08-13-40.jpg",
+          "sha256": "b9c224b11d3fb9a405631bda94cec3d81e0f209cb52b885169b7c38ea7be3cea"
+        },
+        {
+          "filename": "photo_4_2026-10-24_08-13-40.jpg",
+          "sha256": "7b4b9ba5c3332ef8ba851e800736439744c444d1650b49822a037f1af9fc9209"
+        },
+        {
+          "filename": "photo_5_2026-10-24_08-13-40.jpg",
+          "sha256": "06a229e304e36286c1f2e72c4822296b0d1e5a49fae07a62b96b1da77602e5ce"
+        },
+        {
+          "filename": "photo_6_2026-10-24_08-13-40.jpg",
+          "sha256": "e0a39337d4119c2ab7ec6b6287fc2439220e92170860746ec10eda1676f6795d"
+        },
+        {
+          "filename": "photo_7_2026-10-24_08-13-40.jpg",
+          "sha256": "67fa57826a1809e387c31134afbb943cf42d74bb7c35a9db6b6ec5b64d0d69fa"
+        },
+        {
+          "filename": "photo_8_2026-10-24_08-13-40.jpg",
+          "sha256": "a1236c2ffc6f312c3012076628171c73624328b49e54dfd8b3cffde41e573398"
+        }
+      ]
+    },
+    {
+      "id": "duplicate_frames",
+      "description": "Same frame used multiple times",
+      "reason": "Invalid angular progression",
+      "directory": "negative_duplicates",
+      "frames": [
+        {
+          "filename": "photo_10_2026-10-24_08-13-40.jpg",
+          "sha256": "36fc2fcc2cca9c2227f17a18626c60fbc18737e13b3077bcad7d264962ae7a68"
+        },
+        {
+          "filename": "photo_11_2026-10-24_08-13-40.jpg",
+          "sha256": "437af4450f2afa124be28a369335737632e84f0fd47b67d1b0e92ac6ff39e16d"
+        },
+        {
+          "filename": "photo_12_2026-10-24_08-13-40.jpg",
+          "sha256": "fde1ea4cd7e79806457d8598c192d9c960b8b0cb7e15898da8110ee12bfb36e2"
+        },
+        {
+          "filename": "photo_13_2026-10-24_08-13-40.jpg",
+          "sha256": "4a40b11b5f793ea56df490e0c8f9087266083da74f062c7b7fa4f3b43b3455ec"
+        },
+        {
+          "filename": "photo_14_2026-10-24_08-13-40.jpg",
+          "sha256": "20b42e84c62ebaba47bc9fc42d6ded5f7a612d2b714b8b7128043d42380d617f"
+        },
+        {
+          "filename": "photo_15_2026-10-24_08-13-40.jpg",
+          "sha256": "3e7ed20176a903d5baaa37856890b8251512c0d35848f623bdbc78373152324e"
+        },
+        {
+          "filename": "photo_16_2026-10-24_08-13-40.jpg",
+          "sha256": "2d281bfc1a30d63049e2e2629849c09434d4639301e20e9fd7230423c8af7179"
+        },
+        {
+          "filename": "photo_1_2026-10-24_08-13-40.jpg",
+          "sha256": "f42c826cdc4492d7e69f746c0a6e35edf19e86d9590be3e9fbb062e79d2b4059"
+        },
+        {
+          "filename": "photo_2_2026-10-24_08-13-40.jpg",
+          "sha256": "d7cc07bea63d5e839e673dd1844eeca6899c82b9048925c453f4fad02b629ded"
+        },
+        {
+          "filename": "photo_3_2026-10-24_08-13-40.jpg",
+          "sha256": "b9c224b11d3fb9a405631bda94cec3d81e0f209cb52b885169b7c38ea7be3cea"
+        },
+        {
+          "filename": "photo_4_2026-10-24_08-13-40.jpg",
+          "sha256": "7b4b9ba5c3332ef8ba851e800736439744c444d1650b49822a037f1af9fc9209"
+        },
+        {
+          "filename": "photo_5_2026-10-24_08-13-40.jpg",
+          "sha256": "7b4b9ba5c3332ef8ba851e800736439744c444d1650b49822a037f1af9fc9209"
+        },
+        {
+          "filename": "photo_6_2026-10-24_08-13-40.jpg",
+          "sha256": "e0a39337d4119c2ab7ec6b6287fc2439220e92170860746ec10eda1676f6795d"
+        },
+        {
+          "filename": "photo_7_2026-10-24_08-13-40.jpg",
+          "sha256": "67fa57826a1809e387c31134afbb943cf42d74bb7c35a9db6b6ec5b64d0d69fa"
+        },
+        {
+          "filename": "photo_8_2026-10-24_08-13-40.jpg",
+          "sha256": "a1236c2ffc6f312c3012076628171c73624328b49e54dfd8b3cffde41e573398"
+        },
+        {
+          "filename": "photo_9_2026-10-24_08-13-40.jpg",
+          "sha256": "9f91945c915aaded0da3f530188a58ecb37594b87aa04d21e5ebb7e1a2b15a8e"
+        }
+      ]
+    }
+  ],
+  "notes": "Device model and original capture date were not independently verified; file names indicate 2026-10-24. No unrelated-location fixture is claimed. Synthetic API images are not physical-device acceptance."
+}
